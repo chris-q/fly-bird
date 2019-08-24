@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		canvas {
+			display: block;
+			border: 1px solid red;
+			margin: 0 auto;
+		}
+		#btn {
+			position: absolute;
+			left: 444px;
+			top:5px;
+		} 
+	</style>
+</head>
+<body>
+	<canvas id="myCanvas" width="360" height="512"></canvas>
+	<script type="text/javascript" src="js/Game.js"></script>
+	<script type="text/javascript" src="js/Pipe.js"></script>
+	<script type="text/javascript" src="js/Bird.js"></script>
+	<script type="text/javascript" src="js/Background.js"></script>
+	<script type="text/javascript">
+	// 定义图片数组
+	var arr =  ["images/bird1_0.png", "images/bird1_1.png", "images/bird1_2.png", "images/bg_night.png", "images/land.png", "images/pipe_down.png", "images/pipe_up.png"]
+
+
+	// 封装一个函数， 传递两个参数，第一个参数是一个图片数组，第二个参数是回调函数，当所有的图片加载完毕之后执行回调函数
+
+	// 调用loadImage
+	loadImage(arr, function(imgArr) {
+		// 获取元素
+		var canvas = document.getElementById("myCanvas");
+		// 获取画笔
+		var ctx = canvas.getContext("2d");
+
+		// 初始化bird类
+		var bird = new Bird(imgArr.slice(0, 3), 100, 100);
+		// 初始化pipe类
+		var pipe = new Pipe(imgArr[5], imgArr[6], 4, 360);
+		// 初始化land类
+		var land = new Background(imgArr[4], 4, 0, 400);
+		// 初始化mountain类
+		var mountain = new Background(imgArr[3], 2, 0, 0);
+
+
+		// 开始游戏
+		window.g = new Game(ctx, bird, pipe, land, mountain);
+		
+	})
+
+
+	/**
+	 * loadImage方法 用于加载图片并执行回调函数
+	 * @imgArr 图片数组
+	 * @callBack 当图片加载完毕之后， 执行的回调函数
+	 *
+	 *****/
+	function loadImage(arr, callBack) {
+		// 定义信号量
+		var idx = 0;
+		// 定义数组
+		var loadImageArr = [];
+		arr.forEach(function(value, index) {
+			// 创建图片元素
+			var img = new Image();
+			// 设置路径
+			img.src = value;
+			// 添加load事件
+			img.onload = function() {
+				// 改变信号量
+				idx++;
+				// 由于在load事件中加载图片的顺序可能不一致，为了保证图片加载顺序要使用index
+				loadImageArr[index] = this;
+				// console.log(loadImageArr);
+				// console.log(idx);
+				// 判断信号量是否与数组的长度一致
+				if (idx === arr.length) {
+					// 执行callBack
+					callBack(loadImageArr);
+				}
+			}
+		})
+	}	
+
+	
+	</script>
+</body>
+</html>
